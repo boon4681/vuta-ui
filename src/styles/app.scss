@@ -1,0 +1,173 @@
+@import '@fontsource/ibm-plex-sans-jp';
+
+@import 'mixin.scss';
+
+:root {
+    // font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    // font-family: YakuHanJP, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", Meiryo, sans-serif;
+    font-family: 'IBM Plex Sans JP', sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+    font-size: 16px;
+    color-scheme: light dark;
+    color: rgba(255, 255, 255, 0.87);
+    background-color: #242424;
+    font-feature-settings: "palt";
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+
+    --scroll-bar-color: #c5c9ce;
+    --scroll-bar-subcolor: #b5babe;
+    --scroll-bar-bg: #36393f;
+    image-rendering: auto;
+    image-rendering: high-quality;
+    image-rendering: optimizeQuality;
+    --fontsource-display: optional;
+}
+
+body {
+    margin: 0;
+    display: flex;
+    place-items: center;
+    height: 100%;
+    overscroll-behavior-y: contain;
+}
+
+input {
+    font-family: 'Source Code Pro', Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    outline: none;
+    border: none;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.container {
+    @include scrollbar($bg: #242424, $width: 8px);
+
+    .inner {
+        padding: 0 10px;
+        padding-right: 4px;
+
+        @include Sx800 {
+            padding: 0 20px;
+        }
+    }
+}
+
+.pager {
+    @include space-x
+}
+
+@mixin box {
+    max-width: 400px;
+
+    @include Sx600 {
+        max-width: 600px;
+    }
+
+    @include Sx800 {
+        max-width: 800px;
+    }
+}
+
+.box {
+    @include box();
+}
+
+.card {
+    @include box();
+
+    .header {
+        flex-direction: column;
+
+        .thumbnail {
+            width: 200px;
+        }
+
+        @include Sx600 {
+            flex-direction: row;
+            width: 100%;
+        }
+
+        @include mSx600 {
+            >div {
+                display: flex;
+
+                .thumbnail {
+                    width: 100%;
+                    margin: 0 auto;
+                }
+            }
+
+            .title {
+                margin-top: 8px;
+                margin-left: 0 !important;
+                flex-direction: column-reverse !important;
+            }
+        }
+    }
+}
+
+.queue {
+    padding: 0 20px;
+
+    @include Sx600 {
+        padding: 0 40px;
+    }
+
+    @include Sx800 {
+        @include scrollbar($bg: #36393f, $width: 12px);
+    }
+}
+
+*,
+::after,
+::before {
+    box-sizing: border-box;
+}
+
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    border: none;
+    background: transparent;
+}
+
+
+.space-y {
+    @include space-y(1rem);
+}
+
+.space-x {
+    @include space-x(0.5em);
+}
+
+.scroll {
+    @include scrollbar;
+}
+
+.btn-group {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}

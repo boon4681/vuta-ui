@@ -1,0 +1,124 @@
+@mixin space-y($space: 0.5em) {
+    >* {
+        margin-top: $space;
+        margin-bottom: $space;
+    }
+
+    >:first-child {
+        margin-bottom: $space;
+        margin-top: 0;
+    }
+
+    >:last-child {
+        margin-bottom: 0;
+        margin-top: $space;
+    }
+
+    &:has(>:only-child) {
+        >* {
+            margin: 0;
+        }
+    }
+}
+
+@mixin space-x($space: 0.5em) {
+    >* {
+        margin-right: $space;
+    }
+
+    >:first-child {
+        margin-right: $space;
+    }
+    
+    >:last-child {
+        margin-right: 0;
+    }
+
+    &:has(>:only-child) {
+        >* {
+            margin: 0;
+        }
+    }
+}
+
+
+@mixin scrollbar($width: 8px,
+    $thumb: var(--scroll-bar-color),
+    $thumbHover: var(--scroll-bar-subcolor),
+    $bg: var(--scroll-bar-bg)) {
+
+    &::-webkit-scrollbar {
+        width: $width;
+        height: $width;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: $bg;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: $thumb;
+        border-radius: 10px;
+        border: 2px solid transparent;
+        background-clip: padding-box;
+        mix-blend-mode: color-dodge;
+
+        &:hover {
+            background-color: $thumbHover;
+        }
+    }
+}
+
+@mixin Sx468 {
+    @media (max-width: 468px) {
+        @content;
+    }
+}
+
+@mixin Sx600 {
+    @media (min-width: 600px) {
+        @content;
+    }
+}
+
+@mixin Sx800 {
+    @media (min-width: 800px) {
+        @content;
+    }
+}
+
+@mixin Sx1024 {
+    @media (min-width: 1024px) {
+        @content;
+    }
+}
+
+@mixin Sx1200 {
+    @media (min-width: 1200px) {
+        @content;
+    }
+}
+
+@mixin mSx600 {
+    @media (max-width: 600px) {
+        @content;
+    }
+}
+
+@mixin mSx800 {
+    @media (max-width: 800px) {
+        @content;
+    }
+}
+
+@mixin mSx1024 {
+    @media (max-width: 1024px) {
+        @content;
+    }
+}
+
+@mixin mSx1200 {
+    @media (max-width: 1200px) {
+        @content;
+    }
+}
