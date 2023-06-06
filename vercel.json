@@ -1,8 +1,8 @@
 {
     "rewrites": [
         {
-            "source": "/api/:path(.*)",
-            "destination": "https://vuta-music.boon4681.com/:path"
+            "source": "/api/:match*",
+            "destination": "https://vuta-music.boon4681.com/:match*"
         },
         { "source": "/(.*)", "destination": "/index.html" }
     ]
