@@ -31,6 +31,7 @@
         href="https://youtube.com/channel/{data.id}"
         target="_blank"
         rel="noopener noreferrer"
+        aria-label="{data.title}"
     >
         <ExternalLink />
     </a>

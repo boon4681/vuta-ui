@@ -20,7 +20,7 @@
         </div>
     </div>
     <div class="header">
-        <div>
+        <div class="w-full">
             <div
                 class="thumbnail"
                 style="background-image: url(//vuta-music.boon4681.com/image/{data.videoId}.jpg);"
@@ -90,10 +90,15 @@
             display: flex;
             color: #5bb3ff;
             width: 100%;
+            div:has(.thumbnail){
+                max-width: 300px;
+            }
             .thumbnail {
                 position: relative;
                 border-radius: 8px;
-                aspect-ratio: 320/180;
+                // aspect-ratio: 320/180;
+                width: 100%;
+                padding-bottom: 56.52%;
                 background-position: center;
                 background-size: cover;
                 box-shadow: 0px 4px 16px #0000004d;

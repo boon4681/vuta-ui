@@ -21,13 +21,16 @@
     import Queue from "./Queue.svelte";
     import PlayButton from "./PlayButton.svelte";
     import List from "../icons/List.svelte";
-    const { duration, currentTime,  is_load, playing } = AudioPlayer;
+    import { useLocation, useNavigate } from "svelte-navigator";
+    const location = useLocation();
+    const navigate = useNavigate();
+    
     export let data: Hit;
 
     let { videoId, highlightedText, channelId } = data;
     let ytlink = `https://youtube.com/watch?v=${videoId}`;
     let chlink = `https://youtube.com/channel/${channelId}`;
-    let thumbnail = `//i.ytimg.com/vi/${videoId}/mqdefault.jpg`;
+    let thumbnail = `//vuta-music.boon4681.com/image/square/${data.videoId}.jpg`;
 
     $: {
         videoId = data.videoId;
@@ -35,7 +38,7 @@
         channelId = data.channelId;
         ytlink = `https://youtube.com/watch?v=${videoId}`;
         chlink = `https://youtube.com/channel/${channelId}`;
-        thumbnail = `//i.ytimg.com/vi/${videoId}/mqdefault.jpg`;
+        thumbnail = `//vuta-music.boon4681.com/image/square/${data.videoId}.jpg`;
     }
 
     export let queue = false;
@@ -48,6 +51,24 @@
 
     $: if (sizeLg && !$sizeLg) {
         big_banner = false;
+    }
+
+    const onQueue = (e?: MouseEvent) => {
+        if (e) {
+            if (e.target == control) {
+                navigate("/queue");
+            }
+        } else {
+            if (!queue) {
+                navigate("/queue");
+            } else {
+                navigate("/");
+            }
+        }
+    };
+
+    $: {
+        queue = $location.pathname == "/queue";
     }
 
     onMount(() => {
@@ -92,11 +113,7 @@
             class="control"
             class:control-mobile={!$sizeLg}
             bind:this={control}
-            on:click={(e) => {
-                if (e.target == control) {
-                    queue = true;
-                }
-            }}
+            on:click={onQueue}
         >
             <div class="control-group">
                 <div class="music-label">
@@ -144,19 +161,21 @@
                 </div>
                 {#if $sizeLg}
                     <div>
-                        <div class="btn-group">
-                            <button>
+                        <div class="btn-group space-x">
+                            <button
+                                on:click|capture={() => AudioPlayer.previous()}
+                            >
                                 <SkBack />
                             </button>
                             <PlayButton {data} />
-                            <button>
+                            <button on:click|capture={() => AudioPlayer.next()}>
                                 <SkNext />
                             </button>
                         </div>
                         <ProcessBar />
                     </div>
                     <div class="mobile menu">
-                        <button on:click|capture={() => (queue = !queue)}>
+                        <button on:click|capture={() => onQueue()}>
                             <List size={24} />
                         </button>
                     </div>

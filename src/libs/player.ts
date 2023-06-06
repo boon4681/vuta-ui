@@ -6,7 +6,47 @@ export function playerRequest(videoId: string) {
     return fetch(`api/v1/player?videoId=${videoId}`);
 }
 
-function metadata(queue: Comments) {
+
+async function updateTrack(data: Hit, queue: Comments, active: number) {
+    if (queue[active]) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: queue[active][1].text,
+            artist: data.channelTitle,
+            album: data.videoTitle,
+            artwork: [
+                {
+                    src: `https://vuta-music.boon4681.com/image/square/${data.videoId}.jpg`,
+                    sizes: `512x512`,
+                    type: "image/jpeg",
+                },
+            ],
+        });
+    } else {
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: data.videoTitle,
+            artist: data.channelTitle,
+            album: data.videoTitle,
+            artwork: [
+                {
+                    src: `https://vuta-music.boon4681.com/image/square/${data.videoId}.jpg`,
+                    sizes: `512x512`,
+                    type: "image/jpeg",
+                },
+            ],
+        });
+    }
+}
+
+function metadata(data: Hit, queue: Comments, active: number) {
+    if ("mediaSession" in navigator) {
+        updateTrack(data, queue, active)
+        navigator.mediaSession.setActionHandler("play", () => {
+            AudioPlayer.play();
+        });
+        navigator.mediaSession.setActionHandler("pause", () => AudioPlayer.pause());
+        navigator.mediaSession.setActionHandler("previoustrack", () => AudioPlayer.previous());
+        navigator.mediaSession.setActionHandler("nexttrack", () => AudioPlayer.next());
+    }
 }
 
 export class Player {
@@ -25,6 +65,7 @@ export class Player {
             this.duration.set(this._player.duration)
             this.currentTime.set(this._player.currentTime)
             this.play()
+            metadata(get(this.data) as unknown as Hit, get(this.queue), get(this.active))
         }
         this._player.autoplay = true;
         this._player.preload = "metadata";
@@ -34,6 +75,7 @@ export class Player {
         this._player.onloadedmetadata = () => {
             this.is_load.set(false)
             this.duration.set(this._player.duration)
+            metadata(get(this.data) as unknown as Hit, get(this.queue), get(this.active))
         }
         this._player.ontimeupdate = () => {
             if (get(this.is_load)) {
@@ -45,6 +87,7 @@ export class Player {
                 .filter((a) => a[1] <= get(this.currentTime))
                 .sort((a, b) => a[1] - b[1])
                 .slice(-1) ?? [])[0] ?? [])[0] ?? -1)
+            updateTrack(get(this.data) as unknown as Hit, get(this.queue), get(this.active))
         }
         this._player.onended = () => {
             this.playing.set(false)
@@ -56,6 +99,7 @@ export class Player {
         if (!window['_player']) {
             this._player.load()
         }
+        this.redeem()
         window['_player'] = this._player
     }
     get music() {
@@ -70,8 +114,34 @@ export class Player {
         this.currentTime.set(time)
         this._player.currentTime = time
     }
+    async redeem() {
+        if(!this._player.src) return;
+        const parsed = new URL(this._player.src)
+        const data = get(this.data) as Hit
+        if (Number(parsed.searchParams.get('expire')) < Date.now() / 1000) {
+            if (get(this.data)['videoId']) {
+                const music = await AudioPlayer.getSRC(data).catch(e => e);
+                this.data.set(data)
+                if (music instanceof Error) {
+                    this.duration.set(0)
+                    this.currentTime.set(0)
+                    this.pause()
+                    AudioPlayer.music = "";
+                    throw music
+                }
+                error.set("")
+                const queue = comments(data.videoId, data.highlightedText, "queue") as Comments
+                this.queue.set(queue)
+                this.active.set(((queue.map((a, i) => [i, getTime(a[0].text)])
+                    .filter((a) => a[1] <= get(this.currentTime))
+                    .sort((a, b) => a[1] - b[1])
+                    .slice(-1) ?? [])[0] ?? [])[0] ?? -1)
+                AudioPlayer.music = music.url;
+            }
+        }
+    }
     async getMusic(data: Hit) {
-        if (get(this.is_load)) throw new Error("loading");
+        if (get(this.is_load)) return;
         if (get(this.data)['id'] != data.id) {
             const music = await AudioPlayer.getSRC(data).catch(e => e);
             this.data.set(data)
@@ -108,7 +178,20 @@ export class Player {
                 throw new Error(a.playabilityStatus.status)
             })
     }
+    next() {
+        const next = get(this.queue).slice(get(this.active) + 1)[0]
+        if (next) {
+            this.updateTime(getTime(next[0]['text']))
+        }
+    }
+    previous() {
+        const previous = get(this.queue).slice(get(this.active) - 1)[0]
+        if (previous) {
+            this.updateTime(getTime(previous[0]['text']))
+        }
+    }
     play() {
+        this.redeem()
         if ("mediaSession" in navigator) {
             navigator.mediaSession.playbackState = "playing";
         }

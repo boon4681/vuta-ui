@@ -1,17 +1,10 @@
 @mixin space-y($space: 0.5em) {
     >* {
-        margin-top: $space;
         margin-bottom: $space;
-    }
-
-    >:first-child {
-        margin-bottom: $space;
-        margin-top: 0;
     }
 
     >:last-child {
         margin-bottom: 0;
-        margin-top: $space;
     }
 
     &:has(>:only-child) {

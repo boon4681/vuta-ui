@@ -12,6 +12,7 @@
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.3",
     "@tsconfig/svelte": "^4.0.1",
+    "pwa-asset-generator": "^6.3.1",
     "sass": "^1.62.1",
     "svelte": "^3.57.0",
     "svelte-check": "^2.10.3",
@@ -20,9 +21,14 @@
     "vite": "^4.3.2"
   },
   "dependencies": {
+    "@capacitor/android": "^5.0.4",
+    "@capacitor/cli": "^5.0.4",
+    "@capacitor/core": "^5.0.4",
+    "@capacitor/ios": "^5.0.4",
     "@fontsource/ibm-plex-sans-jp": "^5.0.2",
     "nanoid": "^4.0.2",
     "svelte-loading-spinners": "^0.3.4",
+    "svelte-navigator": "^3.2.2",
     "yakuhanjp": "^3.4.1"
   }
 }

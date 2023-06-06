@@ -20,8 +20,11 @@
     import PlayButton from "./PlayButton.svelte";
     import SkNext from "../icons/SKNext.svelte";
     import ProcessBar from "./ProcessBar.svelte";
-    import { error } from "../../libs/store";
-    const { currentTime, is_load, playing,active } = AudioPlayer;
+    import { channel, error } from "../../libs/store";
+    const { currentTime, is_load, playing, active } = AudioPlayer;
+    import { useLocation, useNavigate } from "svelte-navigator";
+    const location = useLocation();
+    const navigate = useNavigate();
 
     export let data: Hit;
     export let open: boolean;
@@ -79,7 +82,7 @@
         <button
             style="width: 50px;height:50px;margin-left:-10px;margin-top:10px"
             on:click={() => {
-                open = false
+                navigate("/", { replace: true });
             }}
         >
             <ChevonD size={50} />
@@ -108,14 +111,20 @@
         <div class="player">
             <button
                 style="width: 50px;height:50px;margin-left:-10px;margin-top:10px"
-                on:click={() => (open = !open)}
+                on:click={() => {
+                    if (!open) {
+                        navigate("/queue", { replace: true });
+                    } else {
+                        navigate("/", { replace: true });
+                    }
+                }}
             >
                 <ChevonD size={50} />
             </button>
             <div class="banner">
                 <div
                     class="thumbnail"
-                    style="background-image: url(//vuta-music.boon4681.com/image/{data.videoId}.jpg);"
+                    style="background-image: url(//vuta-music.boon4681.com/image/square/{data.videoId}.jpg);"
                 />
             </div>
             <div>
@@ -125,7 +134,17 @@
                             {data.videoTitle}
                         </span>
                     </div>
-                    <div class="channel">
+                    <div
+                        class="channel"
+                        on:click|capture={() => {
+                            channel.set({
+                                name: data.channelTitle,
+                                id: data.channelId,
+                            });
+                            navigate("/", { replace: true });
+                            document.dispatchEvent(new Event("vuta.search"));
+                        }}
+                    >
                         <span>
                             {data.channelTitle}
                         </span>
@@ -134,13 +153,13 @@
             </div>
             <div class="control">
                 <ProcessBar />
-                <div class="btn-group">
+                <div class="btn-group space-x">
                     <button> -10s </button>
-                    <button>
+                    <button on:click|capture={() => AudioPlayer.previous()}>
                         <SkBack />
                     </button>
                     <PlayButton big={true} {data} />
-                    <button>
+                    <button on:click|capture={() => AudioPlayer.next()}>
                         <SkNext />
                     </button>
                     <button> +10s </button>
@@ -152,7 +171,16 @@
         <img style="width: 50px;" src="/yomi-full.png" alt="logo" /> Queue
         <div style="width: 100%;" />
         {#if $sizeLg}
-            <button style="width: 50px;" on:click={() => (open = !open)}>
+            <button
+                style="width: 50px;"
+                on:click={() => {
+                    if (!open) {
+                        navigate("/queue", { replace: true });
+                    } else {
+                        navigate("/", { replace: true });
+                    }
+                }}
+            >
                 <ChevonD size={50} />
             </button>
         {/if}
@@ -284,6 +312,10 @@
             font-size: 14px;
             color: rgba(255, 255, 255, 0.658);
             margin-bottom: 5px;
+            cursor: pointer;
+            &:hover {
+                text-decoration: underline;
+            }
         }
     }
     .backdrop {
@@ -363,7 +395,12 @@
                         // background-color: #242527 !important;
                         &.music-order {
                             .play {
-                                display: block;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                div {
+                                    display: flex;
+                                }
                             }
                             .text {
                                 display: none;
@@ -389,7 +426,9 @@
                         background-color: #2a2c2e57;
                         &.music-order {
                             .play {
-                                display: block;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
                             }
                             .text {
                                 display: none;

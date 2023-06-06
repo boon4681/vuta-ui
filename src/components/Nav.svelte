@@ -7,6 +7,10 @@
     import Pager from "./Pager.svelte";
     import InputRadio from "./InputRadio.svelte";
     import { onMount } from "svelte";
+    import { useLocation, useNavigate } from "svelte-navigator";
+    const location = useLocation();
+    const navigate = useNavigate();
+
     let search_modal = false;
     let disable_artist_search = false;
 
@@ -20,6 +24,11 @@
             disable_artist_search = false;
         }
     };
+
+    $: {
+        search_modal = $location.pathname == "/search";
+    }
+
     onMount(() => {
         check($channel);
         const unsub = channel.subscribe(check);
@@ -42,17 +51,23 @@
         }}
     >
         <img class="logo" src="yomi-full.png" alt="" />
-        <!-- <div style="font-weight:600;font-size:20px">VUta</div> -->
+        <div style="font-weight:600;font-size:20px">VUta</div>
     </div>
     <div style="width: 100%;">
-        <Pager />
+        <!-- <Pager /> -->
     </div>
     <div
         style="position: relative;display:flex;justify-content:center;align-items:center;"
     >
         <button
             class:x={search_modal}
-            on:click={() => (search_modal = !search_modal)}
+            on:click={() => {
+                if (!search_modal) {
+                    navigate("/search");
+                } else {
+                    navigate(-1);
+                }
+            }}
         >
             {#if !search_modal}
                 <Search size={32} />
@@ -62,7 +77,9 @@
         </button>
     </div>
 </div>
-
+<div style="padding-bottom: 10px;">
+    <Pager />
+</div>
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 {#if search_modal}
     <div
@@ -184,6 +201,8 @@
         }
     }
     .nav {
+        // display: grid;
+        // grid-template-columns: 100px auto 100px;
         display: flex;
         align-items: center;
         justify-content: center;

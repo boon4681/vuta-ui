@@ -59,6 +59,10 @@ a {
     overflow: hidden;
 }
 
+.w-full{
+    width: 100%;
+}
+
 .container {
     @include scrollbar($bg: #242424, $width: 8px);
 
