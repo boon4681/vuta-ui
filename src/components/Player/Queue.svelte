@@ -154,7 +154,7 @@
             <div class="control">
                 <ProcessBar />
                 <div class="btn-group space-x">
-                    <button> -10s </button>
+                    <button on:click|capture={() => AudioPlayer.seek(-10)}> -10s </button>
                     <button on:click|capture={() => AudioPlayer.previous()}>
                         <SkBack />
                     </button>
@@ -162,7 +162,7 @@
                     <button on:click|capture={() => AudioPlayer.next()}>
                         <SkNext />
                     </button>
-                    <button> +10s </button>
+                    <button on:click|capture={() => AudioPlayer.seek(10)}> +10s </button>
                 </div>
             </div>
         </div>

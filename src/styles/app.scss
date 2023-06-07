@@ -32,7 +32,6 @@ body {
     margin: 0;
     display: flex;
     place-items: center;
-    height: 100%;
     overscroll-behavior-y: contain;
 }
 
@@ -56,7 +55,9 @@ a {
     flex-direction: column;
     width: 100%;
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 .w-full{

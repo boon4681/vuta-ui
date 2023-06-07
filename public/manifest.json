@@ -1,9 +1,10 @@
 {
-    "description": "Listen to the sound of vtuber that you like",
     "version": "0.0.1",
-    "name": "VUta",
-    "short_name": "VUta",
+    "name": "VUtau.app",
+    "short_name": "VUta.app",
+    "description": "Listen to the sound of vtuber that you like",
     "start_url": "/",
+    "display": "standalone",
     "icons": [
         {
             "src": "icons/manifest-icon-192.maskable.png",
@@ -32,6 +33,5 @@
     ],
     "theme_color": "#242424",
     "background_color": "#242424",
-    "display": "fullscreen",
     "orientation": "portrait"
 }

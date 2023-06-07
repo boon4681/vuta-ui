@@ -115,7 +115,7 @@ export class Player {
         this._player.currentTime = time
     }
     async redeem() {
-        if(!this._player.src) return;
+        if (!this._player.src) return;
         const parsed = new URL(this._player.src)
         const data = get(this.data) as Hit
         if (Number(parsed.searchParams.get('expire')) < Date.now() / 1000) {
@@ -178,6 +178,10 @@ export class Player {
                 throw new Error(a.playabilityStatus.status)
             })
     }
+    seek(time: number) {
+        time = Math.min(this._player.duration, Math.max(0, this._player.currentTime + time))
+        this.updateTime(time)
+    }
     next() {
         const next = get(this.queue).slice(get(this.active) + 1)[0]
         if (next) {
@@ -186,8 +190,12 @@ export class Player {
     }
     previous() {
         const previous = get(this.queue).slice(get(this.active) - 1)[0]
-        if (previous) {
-            this.updateTime(getTime(previous[0]['text']))
+        if (get(this.active) > 1) {
+            if (previous) {
+                this.updateTime(getTime(previous[0]['text']))
+            }
+        } else {
+            this.updateTime(0)
         }
     }
     play() {
