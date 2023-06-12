@@ -51,7 +51,7 @@
         }}
     >
         <img class="logo" src="yomi-full.png" alt="" />
-        <div style="font-weight:600;font-size:20px">VUta</div>
+        <div style="font-weight:600;font-size:20px">VUtau</div>
     </div>
     <div style="width: 100%;">
         <!-- <Pager /> -->
@@ -59,6 +59,14 @@
     <div
         style="position: relative;display:flex;justify-content:center;align-items:center;"
     >
+        <a
+            href="/donate"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="donate"
+        >
+            <div>Donate ❤️</div>
+        </a>
         <button
             class:x={search_modal}
             on:click={() => {
@@ -87,11 +95,18 @@
         class="modal"
         transition:fade={{ duration: 150 }}
     >
+        <div
+            class="close"
+            on:click|capture={(e) => {
+                navigate(-1);
+                search_modal = false;
+            }}
+        />
         <div class="top">
             <div class="home">
                 <img class="logo" src="yomi-full.png" alt="" />
                 <div class="title" style="font-weight:600;font-size:20px">
-                    VUta
+                    VUtau
                 </div>
             </div>
         </div>
@@ -128,6 +143,16 @@
                 <input
                     class:tag={$channel["name"]}
                     on:input|capture={(e) => query.set(e.currentTarget.value)}
+                    on:keydown|capture={(e) => {
+                        if (e.key == "Enter") {
+                            query.set(e.currentTarget.value);
+                            document.dispatchEvent(
+                                new CustomEvent("vuta.search")
+                            );
+                            navigate(-1);
+                            search_modal = false;
+                        }
+                    }}
                     value={$query}
                     type="text"
                     placeholder="Search"
@@ -167,6 +192,22 @@
     }
     button {
         color: inherit;
+    }
+    .donate {
+        white-space: nowrap;
+        font-weight: 600;
+        font-size: 16px;
+        padding-left: 15px;
+        padding-right: 15px;
+        width: 100%;
+        border-radius: 8px;
+        height: 40px;
+        background: #3772f1;
+        margin-right: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
     }
     .search-btn {
         font-weight: 600;
@@ -213,6 +254,13 @@
         margin-left: -15px;
         width: 70px;
         aspect-ratio: 1;
+    }
+    .close {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
     }
     .search {
         position: relative;

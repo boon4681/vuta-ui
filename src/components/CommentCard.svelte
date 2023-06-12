@@ -1,12 +1,26 @@
 <script lang="ts">
-    import { format, format_time, type Hit } from "../libs/utils";
+    import { onMount } from "svelte";
+    import { format, format_time, useMedia, type Hit } from "../libs/utils";
     import Comment from "./Comment.svelte";
     import Play from "./icons/Play.svelte";
 
     export let data: Hit;
 
+    let sizeMd;
+    let sizeSm;
+    let sizeLg;
     const ytlink = `https://youtube.com/watch?v=${data.videoId}`;
     const chlink = `https://youtube.com/channel/${data.channelId}`;
+
+    onMount(() => {
+        const [unsub, sm, md, lg] = useMedia(document.body);
+        sizeSm = sm;
+        sizeMd = md;
+        sizeLg = lg;
+        return () => {
+            unsub();
+        };
+    });
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -20,7 +34,7 @@
         </div>
     </div>
     <div class="header">
-        <div class="w-full">
+        <div class="w-full" class:full={!$sizeLg}>
             <div
                 class="thumbnail"
                 style="background-image: url(//vuta-music.boon4681.com/image/{data.videoId}.jpg);"
@@ -90,15 +104,18 @@
             display: flex;
             color: #5bb3ff;
             width: 100%;
-            div:has(.thumbnail){
+            div:has(.thumbnail) {
                 max-width: 300px;
+                &.full {
+                    max-width: 100%;
+                }
             }
             .thumbnail {
                 position: relative;
                 border-radius: 8px;
                 // aspect-ratio: 320/180;
                 width: 100%;
-                padding-bottom: 56.52%;
+                padding-bottom: 60.52%;
                 background-position: center;
                 background-size: cover;
                 box-shadow: 0px 4px 16px #0000004d;

@@ -4,6 +4,10 @@
             "source": "/api/:match*",
             "destination": "https://vuta-music.boon4681.com/api/:match*"
         },
+        {
+            "source": "/donate/:match*",
+            "destination": "https://vuta-music.boon4681.com/donate"
+        },
         { "source": "/(.*)", "destination": "/index.html" }
     ]
 }

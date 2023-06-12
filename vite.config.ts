@@ -10,6 +10,10 @@ export default defineConfig({
                 target: 'https://vuta-music.boon4681.com/',
                 changeOrigin: true
             },
+            '/donate': {
+                target: 'https://vuta-music.boon4681.com/',
+                changeOrigin: true
+            }
         }
     }
 })
