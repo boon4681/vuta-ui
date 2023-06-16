@@ -239,6 +239,8 @@
             width: 100%;
             max-width: 600px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
     }
     .nav {
