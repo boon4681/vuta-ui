@@ -13,24 +13,24 @@
     import { AudioPlayer, playerRequest } from "../../libs/player";
     import SkBack from "../icons/SKBack.svelte";
     import SkNext from "../icons/SKNext.svelte";
-    import Debug from "../Debug.svelte";
     import ChevonD from "../icons/ChevonD.svelte";
     import ChevonU from "../icons/ChevonU.svelte";
     import { Circle } from "svelte-loading-spinners";
     import ProcessBar from "./ProcessBar.svelte";
-    import Queue from "./Queue.svelte";
     import PlayButton from "./PlayButton.svelte";
     import List from "../icons/List.svelte";
     import { useLocation, useNavigate } from "svelte-navigator";
+    import Slider from "../Slider.svelte";
     const location = useLocation();
     const navigate = useNavigate();
-    
+
     export let data: Hit;
+    export let disable: boolean = false;
 
     let { videoId, highlightedText, channelId } = data;
     let ytlink = `https://youtube.com/watch?v=${videoId}`;
     let chlink = `https://youtube.com/channel/${channelId}`;
-    let thumbnail = `//vuta-music.boon4681.com/image/square/${data.videoId}.jpg`;
+    let thumbnail = `//vuta-api.illyaz.dev/image/square/${data.videoId}.jpg`;
 
     $: {
         videoId = data.videoId;
@@ -38,10 +38,9 @@
         channelId = data.channelId;
         ytlink = `https://youtube.com/watch?v=${videoId}`;
         chlink = `https://youtube.com/channel/${channelId}`;
-        thumbnail = `//vuta-music.boon4681.com/image/square/${data.videoId}.jpg`;
+        thumbnail = `//vuta-api.illyaz.dev/image/square/${data.videoId}.jpg`;
     }
 
-    export let queue = false;
     let ref: HTMLElement;
     let control: HTMLElement;
     let sizeMd;
@@ -53,30 +52,12 @@
         big_banner = false;
     }
 
-    const onQueue = (e?: MouseEvent) => {
-        if (e) {
-            if (e.target == control) {
-                navigate("/queue");
-            }
-        } else {
-            if (!queue) {
-                navigate("/queue");
-            } else {
-                navigate("/");
-            }
-        }
-    };
-
-    $: {
-        queue = $location.pathname == "/queue";
-    }
-
     onMount(() => {
         const [unsub, sm, md, lg] = useMedia(document.body);
         sizeSm = sm;
         sizeMd = md;
         sizeLg = lg;
-        big_banner = true;
+        big_banner = false;
         return () => {
             unsub();
             AudioPlayer.destroy();
@@ -90,9 +71,9 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="player" bind:this={ref}>
-    {#if (!$sizeLg && !queue) || $sizeLg}
+    {#if !$sizeLg || $sizeLg}
         <div class="header">
-            {#if big_banner}
+            {#if data["videoTitle"] && big_banner}
                 <div class="banner">
                     <div
                         transition:fly={{ y: 200, opacity: 1, duration: 150 }}
@@ -113,76 +94,82 @@
             class="control"
             class:control-mobile={!$sizeLg}
             bind:this={control}
-            on:click={onQueue}
         >
             <div class="control-group">
                 <div class="music-label">
-                    <div class="image" class:show={!big_banner}>
-                        {#if !big_banner}
-                            <div
-                                transition:fly={{
-                                    x: -50,
-                                    opacity: 1,
-                                    duration: 150,
-                                }}
-                                on:click|capture={() => (big_banner = true)}
-                                class="thumbnail"
-                                style="background-image: url({thumbnail});"
-                            >
-                                <div class="overlay">
-                                    <div class="chevon-u">
-                                        <ChevonU size={24} />
+                    {#if data["videoTitle"]}
+                        <div class="image" class:show={!big_banner}>
+                            {#if !big_banner}
+                                <div
+                                    transition:fly={{
+                                        x: -50,
+                                        opacity: 1,
+                                        duration: 150,
+                                    }}
+                                    on:click|capture={() => (big_banner = true)}
+                                    class="thumbnail"
+                                    style="background-image: url({thumbnail});"
+                                >
+                                    <div class="overlay">
+                                        <div class="chevon-u">
+                                            <ChevonU size={24} />
+                                        </div>
                                     </div>
                                 </div>
+                            {/if}
+                        </div>
+                        <div class="title">
+                            <div>
+                                <a
+                                    href={ytlink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    {data.videoTitle}
+                                </a>
                             </div>
-                        {/if}
-                    </div>
-                    <div class="title">
-                        <div>
-                            <a
-                                href={ytlink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                {data.videoTitle}
-                            </a>
+                            <div>
+                                <a
+                                    class="channel"
+                                    href={chlink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    {data.channelTitle}
+                                </a>
+                            </div>
                         </div>
-                        <div>
-                            <a
-                                class="channel"
-                                href={chlink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                {data.channelTitle}
-                            </a>
-                        </div>
-                    </div>
+                    {/if}
                 </div>
                 {#if $sizeLg}
                     <div>
                         <div class="btn-group space-x">
                             <button
-                                on:click|capture={() => AudioPlayer.previous()}
+                                on:click|capture={() => {
+                                    if (!disable) AudioPlayer.previous();
+                                }}
+                                class:disable
                             >
                                 <SkBack />
                             </button>
-                            <PlayButton {data} />
-                            <button on:click|capture={() => AudioPlayer.next()}>
+                            <PlayButton
+                                {data}
+                                disable={!!!data["videoTitle"]}
+                            />
+                            <button
+                                on:click|capture={() => {
+                                    if (!disable) AudioPlayer.next();
+                                }}
+                                class:disable
+                            >
                                 <SkNext />
                             </button>
                         </div>
-                        <ProcessBar />
+                        <ProcessBar disable />
                     </div>
                     <div class="mobile menu">
-                        <button on:click|capture={() => onQueue()}>
-                            <List size={24} />
-                        </button>
-                    </div>
-                {:else if !queue}
-                    <div class="mobile">
-                        <div>
-                            <PlayButton {data} />
+                        <div style="width: 120px;">
+                            <Slider />
                         </div>
                     </div>
                 {/if}
@@ -190,15 +177,6 @@
         </div>
     {/if}
 </div>
-{#if queue}
-    <div
-        class="queue"
-        class:sm={!$sizeLg}
-        transition:fly={{ y: 100, duration: 150 }}
-    >
-        <Queue bind:open={queue} {data} />
-    </div>
-{/if}
 
 <style lang="scss">
     .queue {
@@ -228,7 +206,7 @@
     .mobile {
         justify-content: center;
         align-items: flex-end !important;
-        margin-right: 15px;
+        padding-right: 15px;
     }
     .control-mobile {
         cursor: pointer;
@@ -249,6 +227,7 @@
         z-index: 1000;
         width: 100%;
         flex: 1;
+        height: 100%;
         .header {
             position: absolute;
             top: 0;
@@ -264,9 +243,8 @@
             align-items: center;
             bottom: 0;
             left: 0;
-            height: 80px;
+            height: 100%;
             width: 100%;
-            background-color: #36393f;
             padding-bottom: 15px;
             box-shadow: 0px 4px 32px #0000004d;
             button {
@@ -396,6 +374,13 @@
             background-position: center;
             background-size: cover;
             box-shadow: 0px 4px 16px #0000004d;
+        }
+    }
+    .disable {
+        color: #b6b6b665 !important;
+        &:hover {
+            cursor: auto;
+            color: #b6b6b665 !important;
         }
     }
 </style>

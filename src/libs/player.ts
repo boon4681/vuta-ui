@@ -218,4 +218,15 @@ export class Player {
     }
 }
 
+
+export const emptyHit = {
+    id: "",
+    videoId: "",
+    channelId: "",
+    channelTitle: "",
+    videoTitle: "",
+    videoPublishDate: new Date(),
+    videoLastUpdate: new Date(),
+    highlightedText: "",
+}
 export const AudioPlayer = new Player()

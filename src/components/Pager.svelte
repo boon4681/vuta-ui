@@ -1,10 +1,8 @@
-<script>
+<script lang="ts">
     import { onMount } from "svelte";
     import { all_page, page } from "../libs/store";
-    import Select from "./Select.svelte";
-    import ChevonL from "./icons/ChevonL.svelte";
-    import ChevonR from "./icons/ChevonR.svelte";
-
+    import { Svroller } from "svrollbar";
+    import Options from "./Options.svelte";
     let all = [];
     $: {
         all = new Array($all_page).fill("").map((_, i) => {
@@ -14,70 +12,39 @@
 </script>
 
 <div class="pager">
-    <button
-        class:disable={$page == 0}
-        on:click={() => {
-            if ($page > 0) {
-                page.set($page - 1);
+    <div class="header">PAGES</div>
+    <Svroller width="100%" height="calc(100vh - 420px)">
+        <Options
+            value={$page}
+            options={all}
+            on:change={(e) => {
+                page.set(e.detail);
                 document.dispatchEvent(new Event("vuta.search"));
-            }
-        }}
-    >
-        <ChevonL />
-    </button>
-    <Select
-        value={$page}
-        options={all}
-        on:change={(e) => {
-            page.set(e.detail);
-            document.dispatchEvent(new Event("vuta.search"));
-        }}
-    />
-    <button
-        class:disable={$page == $all_page - 1}
-        on:click={() => {
-            if ($page < $all_page - 1) {
-                page.set($page + 1);
-                document.dispatchEvent(new Event("vuta.search"));
-            }
-        }}
-    >
-        <ChevonR />
-    </button>
+            }}
+        />
+        <!-- {#each all as page (page.value)}
+            <div class="item">
+                {page.render}
+            </div>
+        {/each} -->
+    </Svroller>
 </div>
 
 <style lang="scss">
     .pager {
+        border-radius: 17px;
+        background: #15151661;
+        height: 100%;
+        max-height: calc(100vh - 300px);
         display: flex;
-        padding: 0 20px;
-        width: 100%;
-        max-width: 300px;
-        margin: 0 auto;
-
-        button {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 8px;
-            padding: 8px;
-            color: #ffffff81;
-            transition: 0.25s;
-            width: 36px;
-            height: 36px;
-            border: 1px #ffffff81 solid;
-            background: transparent;
-            * {
-                pointer-events: none;
-            }
-
-            &:hover {
-                color: white;
-            }
+        flex-direction: column;
+        overflow: hidden;
+        .header {
+            padding: 0.7rem 1rem;
+            font-size: 15px;
         }
-        .disable {
-            cursor: not-allowed;
-            opacity: 0.5;
-            color: #ffffff81 !important;
+        :global(.svlr-contents) {
+            scroll-behavior: smooth;
         }
     }
 </style>

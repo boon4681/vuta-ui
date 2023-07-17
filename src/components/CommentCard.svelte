@@ -12,6 +12,9 @@
     const ytlink = `https://youtube.com/watch?v=${data.videoId}`;
     const chlink = `https://youtube.com/channel/${data.channelId}`;
 
+    let width = window.innerWidth;
+    let wow = (width - 400)/4;
+
     onMount(() => {
         const [unsub, sm, md, lg] = useMedia(document.body);
         sizeSm = sm;
@@ -25,14 +28,14 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="card">
-    <div class="date">
+    <!-- <div class="date">
         <div>
             {new Date(data.videoPublishDate).toLocaleDateString()}
         </div>
         <div>
             {format_time(new Date(data.videoPublishDate).getTime() / 1000)}
         </div>
-    </div>
+    </div> -->
     <div class="header">
         <div class="w-full" class:full={!$sizeLg}>
             <div
@@ -50,6 +53,11 @@
         </div>
         <div class="title">
             <div>
+                <a href={ytlink} target="_blank" rel="noopener noreferrer">
+                    {data.videoTitle}
+                </a>
+            </div>
+            <div>
                 <a
                     class="channel"
                     href={chlink}
@@ -57,11 +65,6 @@
                     rel="noopener noreferrer"
                 >
                     {data.channelTitle}
-                </a>
-            </div>
-            <div>
-                <a href={ytlink} target="_blank" rel="noopener noreferrer">
-                    {data.videoTitle}
                 </a>
             </div>
         </div>
@@ -76,15 +79,18 @@
         position: relative;
         border-radius: 8px;
         // border: 1px solid white;
-        background-color: #36393f;
-        width: 100%;
-        box-shadow: 0px 4px 32px #0000004d;
-        padding: 1rem;
-        padding-top: 1.5rem;
+        border-radius: 21px;
+        padding: 0.7rem;
+        // padding-top: 1.5rem;
+        padding-bottom: 0.5rem;
         // box-shadow: 0 16px 24px 2px rgba(29, 17, 51, 0.04),
         //     0 6px 32px 4px rgba(9, 32, 77, 0.12),
         //     0 8px 12px -5px rgba(29, 17, 51, 0.12);
-
+        font-size: 14px;
+        // max-width: var(--w);
+        border-radius: 21px;
+        background: #202224;
+        box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.12);
         > .date {
             position: absolute;
             top: 2px;
@@ -105,17 +111,18 @@
             color: #5bb3ff;
             width: 100%;
             div:has(.thumbnail) {
-                max-width: 300px;
+                // max-width: 300px;
                 &.full {
                     max-width: 100%;
                 }
             }
             .thumbnail {
                 position: relative;
-                border-radius: 8px;
+                border-radius: 19px;
                 // aspect-ratio: 320/180;
                 width: 100%;
-                padding-bottom: 60.52%;
+                // padding-bottom: 60.52%;
+                padding-bottom: 47%;
                 background-position: center;
                 background-size: cover;
                 box-shadow: 0px 4px 16px #0000004d;

@@ -1,28 +1,16 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { fly } from "svelte/transition";
-    import {
-        useMedia,
-        type Hit,
-        format,
-        comments,
-        getTime,
-    } from "../../libs/utils";
+    import { useMedia, type Hit } from "../../libs/utils";
     import Play from "../icons/Play.svelte";
     import Pause from "../icons/Pause.svelte";
     import { AudioPlayer, playerRequest } from "../../libs/player";
-    import SkBack from "../icons/SKBack.svelte";
-    import SkNext from "../icons/SKNext.svelte";
-    import Debug from "../Debug.svelte";
-    import ChevonD from "../icons/ChevonD.svelte";
-    import ChevonU from "../icons/ChevonU.svelte";
     import { Circle } from "svelte-loading-spinners";
-    import ProcessBar from "./ProcessBar.svelte";
-    import Queue from "./Queue.svelte";
     import { error } from "../../libs/store";
     const { duration, currentTime, is_load, playing } = AudioPlayer;
     export let data: Hit;
     export let big: boolean = false;
+    export let disable: boolean = false;
 
     let sizeMd;
     let sizeSm;
@@ -48,18 +36,21 @@
         class:play={!playing}
         class:pause={playing}
         class:big
+        class:disable
         on:click|capture={() => {
-            AudioPlayer.getMusic(data).then(async (url) => {
-                playing.set(!$playing);
-                if ($playing) {
-                    if (AudioPlayer.music != url) {
-                        AudioPlayer.music = url;
+            if (data["videoTitle"]) {
+                AudioPlayer.getMusic(data).then(async (url) => {
+                    playing.set(!$playing);
+                    if ($playing) {
+                        if (AudioPlayer.music != url) {
+                            AudioPlayer.music = url;
+                        }
+                        AudioPlayer.play();
+                    } else {
+                        AudioPlayer.pause();
                     }
-                    AudioPlayer.play();
-                } else {
-                    AudioPlayer.pause();
-                }
-            });
+                });
+            }
         }}
     >
         <div>
@@ -104,8 +95,15 @@
                 transform: translateY(1px);
             }
             &:hover {
-                background-color: rgba(255, 255, 255, 0.822);
+                background-color: #ffffffd2;
                 color: #2a2c2e;
+            }
+        }
+        &.disable {
+            cursor: auto;
+            background-color: #b6b6b665;
+            &:hover {
+                background-color: #b6b6b665;
             }
         }
         &.play {
