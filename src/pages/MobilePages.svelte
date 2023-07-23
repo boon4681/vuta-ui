@@ -11,7 +11,7 @@
     let all = [];
 
     $: if ($all_page) {
-        all = new Array(100).fill("").map((_, i) => {
+        all = new Array($all_page).fill("").map((_, i) => {
             return { value: i, render: i + 1 + "" };
         });
     }
@@ -22,7 +22,7 @@
     <button
         style="width: 60px;height:60px"
         on:click={() => {
-            navigate(-1);
+            navigate("/");
         }}
     >
         <ChevonL size={20} />

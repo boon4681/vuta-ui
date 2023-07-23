@@ -36,6 +36,7 @@
     import MobileMenu from "./components/MobileMenu.svelte";
     import List from "./components/icons/List.svelte";
     import MobilePages from "./pages/MobilePages.svelte";
+    import X from "./components/icons/X.svelte";
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -76,11 +77,19 @@
                         <Github />
                     </div>
                 </a>
-                <!-- <div class="circle-btn" style="--bg:#8c919618" on:click={()=>{
-                    open = true
-                }}>
-                    <Menu size={24} />
-                </div> -->
+                <div
+                    class="circle-btn modal-btn"
+                    style="--bg:#8c919618"
+                    on:click={() => {
+                        open = !open;
+                    }}
+                >
+                    {#if !open}
+                        <Menu size={24} />
+                    {:else}
+                        <X size={24} />
+                    {/if}
+                </div>
             </div>
         </div>
         {#await searching}
@@ -188,7 +197,7 @@
     </footer>
 {/if}
 
-<!-- <MobileMenu {open} /> -->
+<MobileMenu {open} />
 
 <style lang="scss">
     .container {
@@ -261,5 +270,9 @@
                 cursor: pointer;
             }
         }
+    }
+    .modal-btn{
+        position: relative;
+        z-index: 10000000;
     }
 </style>
