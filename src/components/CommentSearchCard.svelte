@@ -1,6 +1,12 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { format, format_time, useMedia, type Hit } from "../libs/utils";
+    import {
+        format,
+        format_time,
+        useMedia,
+        type Hit,
+        comments,
+    } from "../libs/utils";
     import Comment from "./Comment.svelte";
     import Play from "./icons/Play.svelte";
 
@@ -11,9 +17,6 @@
     let sizeLg;
     const ytlink = `https://youtube.com/watch?v=${data.videoId}`;
     const chlink = `https://youtube.com/channel/${data.channelId}`;
-
-    let width = window.innerWidth;
-    let wow = (width - 400) / 4;
 
     onMount(() => {
         const [unsub, sm, md, lg] = useMedia(document.body);
@@ -28,37 +31,33 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="card">
+    <img
+        class="bg"
+        src="https://vuta-music.boon4681.com/image/low/{data.videoId}.jpg"
+        alt=""
+    />
     <div class="header">
-        <div class="w-full" class:full={!$sizeLg}>
-            <div
-                class="thumbnail"
-                style="background-image: url(//vuta-music.boon4681.com/image/{data.videoId}.jpg);"
-            >
-                <div class="overlay" on:click>
-                    <div class="inner">
-                        <button id="play" class="initial">
-                            <Play />
-                        </button>
-                    </div>
-                </div>
-                <div class="date">
-                    <div>
-                        {new Date(data.videoPublishDate).toLocaleDateString()}
-                    </div>
-                    <div>
-                        {format_time(
-                            new Date(data.videoPublishDate).getTime() / 1000
-                        )}
-                    </div>
+        <div
+            class="thumbnail"
+            style="background-image: url(//vuta-music.boon4681.com/image/{data.videoId}.jpg);"
+        >
+            <div class="overlay" on:click>
+                <div class="inner">
+                    <button id="play" class="initial">
+                        <Play />
+                    </button>
                 </div>
             </div>
         </div>
-        <div class="title">
+        <div class="date">
             <div>
-                <a href={ytlink} target="_blank" rel="noopener noreferrer">
-                    {data.videoTitle}
-                </a>
+                {new Date(data.videoPublishDate).toLocaleDateString()}
             </div>
+            <div>
+                {format_time(new Date(data.videoPublishDate).getTime() / 1000)}
+            </div>
+        </div>
+        <div class="title">
             <div>
                 <a
                     class="channel"
@@ -69,17 +68,36 @@
                     {data.channelTitle}
                 </a>
             </div>
+            <div>
+                <a href={ytlink} target="_blank" rel="noopener noreferrer">
+                    {data.videoTitle}
+                </a>
+            </div>
         </div>
     </div>
-    <div>
-        <Comment videoId={data.videoId} comment={data.highlightedText} />
-    </div>
+    <!-- <div>
+        {#each comments(data.videoId, data.highlightedText) as ele}
+            {#if ele["link"]}
+                <a href={ele["link"]} target="_blank" rel="noopener noreferrer">
+                    {ele["text"]}
+                </a>
+            {:else if ele["glow"]}
+                <span class="glow">{ele["text"]}</span>
+            {:else if ele["text"] == "\n"}
+                <br />
+            {:else}
+                <span>{ele["text"]}</span>
+            {/if}
+        {/each}
+    </div> -->
 </div>
 
 <style lang="scss">
     .card {
         position: relative;
+        width: 100%;
         border-radius: 8px;
+        overflow: hidden;
         // border: 1px solid white;
         border-radius: 21px;
         padding: 0.7rem;
@@ -91,12 +109,28 @@
         font-size: 14px;
         // max-width: var(--w);
         border-radius: 21px;
-        background: #202224;
+        // background: #202224;
         box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.12);
+        &:before {
+            z-index: -3;
+            content: "";
+            position: absolute;
+            width: 0%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            box-shadow: 0px 0px 100vw 100px black, 0px 0px 100vw 0px black;
+            transition: 0.2s cubic-bezier(0.4, 0, 0.6, 1);
+        }
+        &:hover {
+            &:before {
+                box-shadow: 0px 0px 100vw 100px black, 0px 0px 100vw 100px black;
+            }
+        }
         .date {
             position: absolute;
-            bottom: -0.7rem;
-            right: 0.5rem;
+            bottom: 0.5rem;
+            right: 1rem;
             display: flex;
             font-weight: 600;
             font-size: 12px;
@@ -121,19 +155,14 @@
             display: flex;
             color: #5bb3ff;
             width: 100%;
-            div:has(.thumbnail) {
-                // max-width: 300px;
-                &.full {
-                    max-width: 100%;
-                }
-            }
+            flex-direction: row;
             .thumbnail {
                 position: relative;
                 border-radius: 17px;
-                // aspect-ratio: 320/180;
+                aspect-ratio: 1;
+                max-width: 120px;
                 width: 100%;
                 // padding-bottom: 60.52%;
-                padding-bottom: 47%;
                 background-position: center;
                 background-size: cover;
                 box-shadow: 0px 4px 16px #0000004d;
@@ -147,7 +176,9 @@
                     width: 100%;
                     height: 100%;
                     transition: 0.2s;
+                    opacity: 0;
                     &:hover {
+                        opacity: 1;
                         background-color: #36393f52;
                     }
 
@@ -179,10 +210,10 @@
             }
             .title {
                 width: 100%;
-                margin-left: 15px;
+                margin-left: 15px !important;
                 display: flex;
-                flex-direction: column;
                 overflow: hidden;
+                flex-direction: column !important;
                 div {
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -199,6 +230,19 @@
                     margin-bottom: 5px;
                 }
             }
+        }
+        .bg {
+            z-index: 0;
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            // filter: brightness(0.7) contrast(4) brightness(3) blur(100px);
+            // filter: saturate(5) hue-rotate(323deg) blur(100px) brightness(0.7) contrast(4);
+            filter: saturate(4) hue-rotate(323deg) contrast(4) brightness(3) contrast(0.7)
+                blur(100px);
         }
     }
 </style>

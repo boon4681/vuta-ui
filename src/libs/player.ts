@@ -1,6 +1,6 @@
 import { get, writable, type Writable } from "svelte/store";
 import { error } from "./store";
-import { comments, getTime, type Comments, type Hit } from "./utils";
+import { comments, getTime, type Comments, type Hit, limit } from "./utils";
 
 export function playerRequest(videoId: string) {
     return fetch(`api/v1/player?videoId=${videoId}`);
@@ -49,6 +49,16 @@ function metadata(data: Hit, queue: Comments, active: number) {
     }
 }
 
+export const load_volume = () => {
+    const raw_volume = localStorage.getItem("vuta.volume")
+    if (raw_volume) {
+        if (!isNaN(Number(raw_volume))) {
+            return Number(raw_volume)
+        }
+    }
+    return 1
+}
+
 export class Player {
     private _player = new Audio();
     private _music: Writable<string> = writable("")
@@ -59,7 +69,9 @@ export class Player {
     public is_load: Writable<boolean> = writable(false)
     public queue: Writable<Comments> = writable([])
     public active: Writable<number> = writable(-1)
+    public volume: Writable<number> = writable(1)
     constructor() {
+        this.volume.set(load_volume())
         if (window['_player']) {
             this._player = window['_player']
             this.duration.set(this._player.duration)
@@ -67,6 +79,7 @@ export class Player {
             this.play()
             metadata(get(this.data) as unknown as Hit, get(this.queue), get(this.active))
         }
+        this._player.volume = get(this.volume)
         this._player.autoplay = true;
         this._player.preload = "metadata";
         this._player.onloadstart = () => {
@@ -182,6 +195,12 @@ export class Player {
         time = Math.min(this._player.duration, Math.max(0, this._player.currentTime + time))
         this.updateTime(time)
     }
+    setVolume(volume: number) {
+        volume = limit(volume, 0, 1)
+        localStorage.setItem("vuta.volume", volume.toString())
+        this._player.volume = volume
+        this.volume.set(volume)
+    }
     next() {
         const next = get(this.queue).slice(get(this.active) + 1)[0]
         if (next) {
@@ -218,4 +237,15 @@ export class Player {
     }
 }
 
+
+export const emptyHit = {
+    id: "",
+    videoId: "",
+    channelId: "",
+    channelTitle: "",
+    videoTitle: "",
+    videoPublishDate: new Date(),
+    videoLastUpdate: new Date(),
+    highlightedText: "",
+}
 export const AudioPlayer = new Player()

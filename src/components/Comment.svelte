@@ -11,7 +11,7 @@
     let sizeLg;
     let span: boolean = false;
     const click = () => {
-        if (dim.height > 150) {
+        if (dim.height > 90) {
             span = !span;
         }
     };
@@ -32,22 +32,22 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="comments">
-    <div class="title">Comment</div>
+    <!-- <div class="title">Comment</div> -->
     <div
         bind:this={ref}
         class="comment scroll"
         class:overflow={!span && $sizeLg}
         style="height: {span
-            ? dim.height > 150
-                ? dim.height
-                : 150
-            : 150}px;transition-duration:{limit(
+            ? dim.height > 90
+                ? dim.height + 20
+                : 90
+            : 90}px;transition-duration:{limit(
             (dim.height / 500 - 0.5) * 0.5,
             0.3,
             0.5
         )}s"
     >
-        <div style="position: sticky;width:100%;top:0;">
+        <button style="position: sticky;width:100%;top:0;">
             <div class="maximize" on:click={click}>
                 {#if span}
                     <Minimize />
@@ -55,7 +55,7 @@
                     <Maximize />
                 {/if}
             </div>
-        </div>
+        </button>
         <span>
             {#each comments(videoId, comment) as ele}
                 {#if ele["link"]}
@@ -83,10 +83,8 @@
     .comments {
         position: relative;
         margin-top: 10px;
-        .title {
-            font-size: 14px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #f5f5f536;
+        button {
+            color: #ffffffde;
         }
         .comment {
             position: relative;
@@ -95,15 +93,17 @@
             transition-property: height;
             overflow-y: hidden;
             overflow-x: hidden;
-            padding-right: 8px;
+            // padding-right: 8px;
+            overflow: hidden;
 
             &.overflow {
                 padding-right: 0px;
-                overflow-y: auto;
+                overflow-y: hidden;
             }
 
             span {
                 white-space: pre-line;
+                padding-bottom: 20px;
                 &.glow {
                     font-weight: 600;
                     color: #3dd456;
@@ -135,11 +135,15 @@
             }
             .shadow {
                 position: sticky;
-                bottom: -5px;
+                bottom: -1px;
                 width: 100%;
                 z-index: 2;
-                height: 20px;
-                box-shadow: inset 0px -20px 10px 0px #36393f;
+                height: 40px;
+                background: linear-gradient(
+                    0deg,
+                    #202224 20%,
+                    rgba(32, 34, 36, 0) 100%
+                );
             }
         }
     }

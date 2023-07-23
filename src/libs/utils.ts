@@ -184,7 +184,8 @@ export const comments = (videoId: string, comment: string, mode: "normal" | "que
             }
         }
         // console.log(final.map((a, i) => a['link'] ? [a, final[i + 1]] : undefined).filter(a => a))
-        return groups.map((a, i) => a['link'] ? groups[i + 1] ? !groups[i + 1]['link'] ? [a, groups[i + 1]] : undefined : undefined : undefined).filter(a => a && a[1].text.trim().length)
+        return groups.map((a, i) => a['link'] ? groups[i + 1] ? !groups[i + 1]['link'] ? [a, groups[i + 1]] : undefined : undefined : undefined)
+        .filter(a => a && a[1].text.trim().length).sort((a,b)=>getTime(a[0].text) - getTime(b[0].text))
     }
     return result
 }

@@ -55,17 +55,21 @@
             border-radius: 15px;
             color: #ffffff81;
             transition: 0.25s;
-            border: 1px #ffffff81 solid;
+            // border: 1px #ffffff81 solid;
+            background-color: #52585a26;
             &:has(input:checked) {
-                color: #4ac6ff;
-                border-color: #4ac6ff;
-                background-color: #00b8ff26;
+                // color: #4ac6ff;
+                // border-color: #4ac6ff;
+                // background-color: #00b8ff26;
+                color: #ffffff;
+                // border-color: #a1a9ad;
+                background-color: #545dfef6;
             }
             &.disable {
                 cursor: not-allowed;
                 color: #ffffff81 !important;
-                border: 1px #ffffff81 solid !important;
-                background-color: transparent !important;
+                // border: 1px #ffffff81 solid !important;
+                background-color: #52585a26 !important;
                 opacity: 0.5;
 
                 * {

@@ -2,9 +2,10 @@
     import { format } from "../../libs/utils";
     import { AudioPlayer, playerRequest } from "../../libs/player";
     const { duration, currentTime, is_load, playing } = AudioPlayer;
+    export let disable: boolean = false;
 </script>
 
-<div class="progress">
+<div class="progress" class:disable>
     <span>{format($currentTime)}</span>
     <div class="bar">
         <div class="buffer" />
@@ -41,7 +42,7 @@
                 appearance: none;
                 background: transparent;
                 border: transparent;
-                cursor: pointer;
+                // cursor: pointer;
                 display: block;
                 height: inherit;
                 inset: 0;
@@ -62,6 +63,21 @@
             progress::-webkit-progress-value {
                 background-color: rgb(255, 255, 255);
             }
+        }
+    }
+    .disable {
+        color: #b6b6b665 !important;
+
+        &:hover {
+            cursor: auto;
+            color: #b6b6b665 !important;
+        }
+        progress::-moz-control-group {
+            background-color: #b6b6b665 !important;
+            color: white;
+        }
+        progress::-webkit-control-group {
+            background-color: #b6b6b665 !important;
         }
     }
 </style>
