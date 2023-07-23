@@ -43,6 +43,7 @@
             .ico {
                 color: #bfbfbf;
             }
+            background-color: #8e939918;
         }
         &:hover {
             background-color: #8c919618;

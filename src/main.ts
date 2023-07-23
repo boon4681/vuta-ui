@@ -1,4 +1,5 @@
 import './styles/app.scss'
+//@ts-ignore
 import App from './App.svelte'
 
 //@ts-ignore

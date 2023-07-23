@@ -7,8 +7,7 @@
     import Logo from "./components/icons/Logo.svelte";
     import Pager from "./components/Pager.svelte";
     import CommentCard from "./components/CommentCard.svelte";
-    import { Svroller } from "svrollbar";
-    import { Router, Link, Route } from "svelte-navigator";
+    import { Route } from "svelte-navigator";
     import { onMount } from "svelte";
     import { AudioPlayer } from "./libs/player";
     import {
@@ -18,6 +17,7 @@
         all_page,
         error,
         playingHIT,
+        channel,
     } from "./libs/store";
     import {
         search,
@@ -26,65 +26,17 @@
         comments,
         limit,
     } from "./libs/utils";
-    import ArtistCard from "./components/ArtistCard.svelte";
     import ChevonL from "./components/icons/ChevonL.svelte";
     import ChevonR from "./components/icons/ChevonR.svelte";
-    import Player from "./components/Player/Player.svelte";
     import { useLocation, useNavigate } from "svelte-navigator";
-    import DesktopSearch from "./components/pages/DesktopSearch.svelte";
+    import DesktopSearch from "./pages/Search.svelte";
+    import DesktopQueue from "./pages/Queue.svelte";
     const location = useLocation();
     const navigate = useNavigate();
 
-    let result: SearchResult;
-    let searching: Promise<SearchResult> = search();
-    let not_found = "";
-    let open_queue = false;
-
-    const fetch = async () => {
-        searching = search();
-        result = await searching;
-        if (result.total == 0) {
-            not_found = $query;
-        }
-        all_page.set(Math.ceil((result.total ?? 1) / 50));
-        return result;
-    };
-    onMount(() => {
-        fetch();
-        if (window["playingHIT"]) {
-            playingHIT.set(window["playingHIT"]);
-            AudioPlayer.data.set($playingHIT);
-            AudioPlayer.queue.set(
-                comments(
-                    $playingHIT["videoId"],
-                    $playingHIT["highlightedText"],
-                    "queue"
-                ) as any
-            );
-            AudioPlayer.redeem();
-        }
-        document.addEventListener("vuta.search", fetch);
-        window.onfocus = () => {
-            search().then(async (a) => {
-                if (result != a) {
-                    result = a;
-                    if (result.total == 0) {
-                        not_found = $query;
-                    }
-                    all_page.set(Math.ceil((result.total ?? 1) / 50));
-                }
-            });
-        };
-        return () => {
-            document.removeEventListener("vuta.search", fetch);
-        };
-    });
-    $: {
-        if ($playingHIT) {
-            window["playingHIT"] = $playingHIT;
-        }
-    }
-
+    export let result: SearchResult;
+    export let searching;
+    export let not_found;
     const on_scroll = (
         e: UIEvent & {
             currentTarget: EventTarget & HTMLDivElement;
@@ -93,13 +45,7 @@
         const box = e.currentTarget.getBoundingClientRect();
         const top = e.currentTarget.scrollTop;
         const height = e.currentTarget.scrollHeight - box.height;
-        if (top < 90) {
-            e.currentTarget.style.top = -top + "px";
-        } else if (top > height / 3) {
-            e.currentTarget.style.top = -200 * (top / height) + "px";
-        } else if (top > 90) {
-            e.currentTarget.style.top = -90 + "px";
-        }
+        e.currentTarget.style.top = -190 * (top / height) + "px";
     };
 </script>
 
@@ -128,9 +74,9 @@
                         navigate("/", {
                             replace: true,
                         });
-                        page.set(0);
-                        document.dispatchEvent(new Event("vuta.search"));
                     }
+                    page.set(0);
+                    document.dispatchEvent(new Event("vuta.search"));
                 }}
             >
                 <Home slot="icon" size={36} />
@@ -153,15 +99,25 @@
             </NavButton>
         </div>
         <Pager />
+        <!-- {#if $location.pathname == "/"}
+        {/if} -->
     </nav>
     <div class="container">
-        <Route path="/" rimary={false}>
+        <Route path="/" primary={false}>
             <div class="title">
                 <div>Comments</div>
                 <div class="flex">
+                    <a
+                        href="/donate"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="donate"
+                    >
+                        <div>Donate ❤️</div>
+                    </a>
                     <button
                         class="circle-btn page-btn"
-                        class:disable={$page == $all_page - 1}
+                        class:disable={$page == 0}
                         on:click={() => {
                             if ($page > 0) {
                                 page.set($page - 1);
@@ -213,7 +169,6 @@
                                                     error.set(e.message);
                                                 });
                                         }
-                                        open_queue = true;
                                     }}
                                 />
                             {/each}
@@ -244,30 +199,15 @@
             {/await}
         </Route>
         <Route primary={false} path="search">
-            <DesktopSearch />
+            <DesktopSearch {result} />
+        </Route>
+        <Route primary={false} path="queue">
+            <DesktopQueue data={$playingHIT} />
         </Route>
     </div>
 </div>
-<footer>
-    <Player data={$playingHIT} disable={!!$playingHIT["channelId"]} />
-</footer>
 
 <style lang="scss">
-    footer {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 97px;
-        z-index: 10000;
-        background: linear-gradient(
-            180deg,
-            rgba(29, 30, 32, 0.77) 0%,
-            #1d1e20 100%
-        );
-        box-shadow: 0px 12px 20px 20px rgb(0 0 0 / 21%);
-        backdrop-filter: blur(3px);
-    }
     .page-btn {
         color: white;
         border: 1px rgba(255, 255, 255, 0.603) solid;
@@ -282,6 +222,7 @@
         width: 100%;
         height: 100%;
         justify-content: flex-end;
+        padding-left: 300px;
     }
     .container {
         position: relative;
@@ -290,7 +231,9 @@
         --scroll-bar-bg: transparent;
     }
     nav {
-        position: relative;
+        position: absolute;
+        left: 0;
+        top: 0;
         display: flex;
         flex-direction: column;
         background-color: #1e1f20b8;
@@ -334,13 +277,15 @@
     .inner {
         position: relative;
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(372px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
         gap: 20px;
         overflow-y: auto;
         overflow-x: hidden;
         width: 100%;
         height: 100%;
         padding-top: 10px;
+        padding-bottom: 100px;
+        justify-content: center;
         // transition: 0.2s all;
         // padding-bottom: 120px;
     }

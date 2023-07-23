@@ -4,7 +4,7 @@
     import { Svroller } from "svrollbar";
     import Options from "./Options.svelte";
     let all = [];
-    $: {
+    $: if($all_page) {
         all = new Array($all_page).fill("").map((_, i) => {
             return { value: i, render: i + 1 + "" };
         });

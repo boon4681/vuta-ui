@@ -131,11 +131,7 @@ a {
     padding: 0 20px;
 
     @include Sx600 {
-        padding: 0 40px;
-    }
-
-    @include Sx800 {
-        @include scrollbar($bg: #36393f, $width: 12px);
+        padding: 0 20px;
     }
 }
 
@@ -206,4 +202,21 @@ button {
     display: flex;
     width: 100%;
     justify-content: center;
+}
+
+.donate {
+    white-space: nowrap;
+    font-weight: 600;
+    font-size: 16px;
+    padding-left: 15px;
+    padding-right: 15px;
+    width: 120px;
+    border-radius: 8px;
+    height: 40px;
+    background: #3772f1;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
 }

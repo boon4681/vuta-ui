@@ -14,7 +14,6 @@
         width: 16px;
         height: 16px;
         display: flex;
-        justify-content: center;
         align-items: center;
         .scale {
             transform: scale(0.4);

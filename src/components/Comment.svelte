@@ -83,11 +83,6 @@
     .comments {
         position: relative;
         margin-top: 10px;
-        .title {
-            font-size: 14px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #f5f5f536;
-        }
         button {
             color: #ffffffde;
         }
@@ -140,7 +135,7 @@
             }
             .shadow {
                 position: sticky;
-                bottom: 0px;
+                bottom: -1px;
                 width: 100%;
                 z-index: 2;
                 height: 40px;

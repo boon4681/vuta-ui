@@ -21,11 +21,15 @@
     import List from "../icons/List.svelte";
     import { useLocation, useNavigate } from "svelte-navigator";
     import Slider from "../Slider.svelte";
+    import Audio from "./Audio.svelte";
+    import { playingHIT } from "../../libs/store";
+    import { current_component } from "svelte/internal";
     const location = useLocation();
     const navigate = useNavigate();
 
     export let data: Hit;
     export let disable: boolean = false;
+    export let bg: boolean = true;
 
     let { videoId, highlightedText, channelId } = data;
     let ytlink = `https://youtube.com/watch?v=${videoId}`;
@@ -47,6 +51,19 @@
     let sizeSm;
     let sizeLg;
     let big_banner = true;
+    export let queue = false;
+
+    const onQueue = () => {
+        if ($location.pathname != "/queue") {
+            navigate("/queue");
+        } else {
+            navigate(-1);
+        }
+    };
+
+    $: {
+        queue = $location.pathname == "/queue";
+    }
 
     $: if (sizeLg && !$sizeLg) {
         big_banner = false;
@@ -70,33 +87,39 @@
 </Debug> -->
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div class="player" bind:this={ref}>
-    {#if !$sizeLg || $sizeLg}
-        <div class="header">
-            {#if data["videoTitle"] && big_banner}
-                <div class="banner">
-                    <div
-                        transition:fly={{ y: 200, opacity: 1, duration: 150 }}
-                        class="thumbnail"
-                        style="background-image: url({thumbnail});"
-                        on:click|capture={() => (big_banner = false)}
-                    >
-                        <div class="overlay">
-                            <div class="chevon-d">
-                                <ChevonD size={32} />
-                            </div>
-                        </div>
+<div class="header">
+    {#if data["videoTitle"] && big_banner && $sizeLg}
+        <div class="banner">
+            <div
+                transition:fly={{ y: 200, opacity: 1, duration: 150 }}
+                class="thumbnail"
+                style="background-image: url({thumbnail});"
+                on:click|capture={() => (big_banner = false)}
+            >
+                <div class="overlay">
+                    <div class="chevon-d">
+                        <ChevonD size={32} />
                     </div>
                 </div>
-            {/if}
+            </div>
         </div>
+    {/if}
+</div>
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<div class="player" class:bg class:sm={!$sizeLg} bind:this={ref}>
+    {#if $playingHIT.id}
         <div
             class="control"
             class:control-mobile={!$sizeLg}
             bind:this={control}
+            on:click={(e) => {
+                if (!$sizeLg && e.target == control) {
+                    onQueue();
+                }
+            }}
         >
             <div class="control-group">
-                <div class="music-label">
+                <div class="music-label fixed">
                     {#if data["videoTitle"]}
                         <div class="image" class:show={!big_banner}>
                             {#if !big_banner}
@@ -141,9 +164,17 @@
                         </div>
                     {/if}
                 </div>
+                {#if !$sizeLg}
+                    <div class="mobile playbtn">
+                        <PlayButton {data} />
+                    </div>
+                {/if}
                 {#if $sizeLg}
-                    <div>
-                        <div class="btn-group space-x">
+                    <div class="main">
+                        <div
+                            class="btn-group space-x"
+                            style="margin-bottom: 5px;"
+                        >
                             <button
                                 on:click|capture={() => {
                                     if (!disable) AudioPlayer.previous();
@@ -169,8 +200,11 @@
                     </div>
                     <div class="mobile menu">
                         <div style="width: 120px;">
-                            <Slider />
+                            <Audio />
                         </div>
+                        <button on:click|capture={onQueue}>
+                            <List size={24} />
+                        </button>
                     </div>
                 {/if}
             </div>
@@ -179,15 +213,14 @@
 </div>
 
 <style lang="scss">
-    .queue {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-    }
-    .queue.sm {
-        z-index: 1000;
+    .bg {
+        background: linear-gradient(
+            180deg,
+            rgba(29, 30, 32, 0.77) 0%,
+            #1d1e20 100%
+        );
+        box-shadow: 0px 12px 20px 20px rgb(0 0 0 / 21%);
+        backdrop-filter: blur(3px);
     }
     .chevon-d,
     .chevon-u {
@@ -203,11 +236,6 @@
     .chevon-u {
         width: 36px;
     }
-    .mobile {
-        justify-content: center;
-        align-items: flex-end !important;
-        padding-right: 15px;
-    }
     .control-mobile {
         cursor: pointer;
         > * {
@@ -219,8 +247,24 @@
             }
         }
     }
-    .menu {
-        margin-bottom: 10px;
+    .header {
+        position: absolute;
+        top: 0;
+    }
+    .overlay {
+        position: absolute;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: 0.2s;
+        background-color: #292a2b46;
+        opacity: 0;
+        &:hover {
+            opacity: 1;
+        }
     }
     .player {
         position: relative;
@@ -228,13 +272,6 @@
         width: 100%;
         flex: 1;
         height: 100%;
-        .header {
-            position: absolute;
-            top: 0;
-            .title {
-                margin-top: 15px;
-            }
-        }
         .control {
             position: relative;
             display: flex;
@@ -271,13 +308,25 @@
                 width: 100%;
                 margin: 10px 0 0 0;
                 // padding: 0 20px;
-                > div {
+                > div:not(.main) {
+                    max-width: 380px;
+                }
+                > div.main {
+                    > :global(*) {
+                        max-width: 380px;
+                        margin: 0 auto;
+                    }
+                }
+                > div:not(.menu) {
                     display: flex;
                     flex-direction: column;
                     // justify-content: center;
                     align-items: center;
                     width: 100%;
-                    overflow: hidden;
+                    // overflow: hidden;
+                    &.fixed {
+                        overflow: hidden;
+                    }
                     &.music-label {
                         flex-direction: row;
                     }
@@ -340,20 +389,10 @@
                 margin-bottom: 5px;
             }
         }
-        .overlay {
-            position: absolute;
-            cursor: pointer;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: 0.2s;
-            background-color: #292a2b46;
-            opacity: 0;
-            &:hover {
-                opacity: 1;
-            }
+    }
+    .sm {
+        .control {
+            padding-bottom: 10px;
         }
     }
     .banner {
@@ -365,7 +404,7 @@
         > .thumbnail {
             position: absolute;
             bottom: 0;
-            left: 5px;
+            left: 10px;
             // border-radius: 6px;
             border-radius: 6px 6px 0 0;
             width: 200px;
@@ -382,5 +421,25 @@
             cursor: auto;
             color: #b6b6b665 !important;
         }
+    }
+    .menu {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        margin-bottom: 10px;
+        width: calc(100% - 150px);
+        > :last-child {
+            margin-right: 15px;
+        }
+    }
+    .playbtn {
+        width: auto !important;
+        margin-bottom: 0 !important;
+        margin-right: 15px !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        pointer-events: all;
     }
 </style>

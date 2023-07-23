@@ -1,19 +1,18 @@
 <script lang="ts">
-    export let size: number = 24;
+    export let size: number = 20;
 </script>
 
 <svg
+    class="with-icon_icon__MHUeb"
+    data-testid="geist-icon"
     fill="none"
-    width={size}
     height={size}
+    width={size}
     shape-rendering="geometricPrecision"
     stroke="currentColor"
     stroke-linecap="round"
     stroke-linejoin="round"
     stroke-width="1.5"
     viewBox="0 0 24 24"
-    style="color:var(--geist-foreground);"
-    ><path d="M11 5L6 9H2v6h4l5 4V5z" /><path d="M23 9l-6 6" /><path
-        d="M17 9l6 6"
-    /></svg
+    ><path d="M3 12h18" /><path d="M3 6h18" /><path d="M3 18h18" /></svg
 >
