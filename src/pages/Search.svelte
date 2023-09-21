@@ -108,15 +108,15 @@
         value={$sort}
         options={[
             {
-                value: 2,
+                value: 3,
                 render: "Artist",
                 disable: disable_artist_search,
             },
             { value: 1, render: "Newest" },
-            { value: 0, render: "Relevance" },
+            { value: 2, render: "Popular" },
             { value: -1, render: "Oldest" },
             { value: -2, render: "Ascending" },
-            { value: 2, render: "Popular" },
+            { value: 0, render: "Relevance" },
         ]}
         on:change={(e) => {
             if (e.detail == 2 && $query == "") {
@@ -137,12 +137,12 @@
         {#if result.total > 0}
             <div class="wrap scroll" on:scroll={on_scroll}>
                 <div class="inner">
-                    {#if $sort == 2}
+                    {#if $sort == 3}
                         {#each result.hits as data}
                             <ArtistCard {data} />
                         {/each}
                     {/if}
-                    {#if $sort != 2 && result.type == 0}
+                    {#if $sort != 3 && result.type == 0}
                         {#each result.hits as data}
                             <CommentSearchCard
                                 {data}

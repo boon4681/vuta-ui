@@ -65,7 +65,7 @@ export const search = async () => {
     const _payload = payload(get(page), get(sort), true)
     _payload.set("query", get(query))
     const url = new URL(api)
-    if (get(sort) == 2) {
+    if (get(sort) == 3) {
         url.pathname = "/search/channels"
         _payload.delete('sort')
         _payload.delete('isUta')
