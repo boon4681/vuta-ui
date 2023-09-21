@@ -113,9 +113,9 @@
                 disable: disable_artist_search,
             },
             { value: 1, render: "Newest" },
-            { value: 2, render: "Popular" },
+            { value: -2, render: "Popular" },
             { value: -1, render: "Oldest" },
-            { value: -2, render: "Ascending" },
+            { value: 2, render: "Ascending" },
             { value: 0, render: "Relevance" },
         ]}
         on:change={(e) => {
