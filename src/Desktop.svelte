@@ -31,22 +31,13 @@
     import { useLocation, useNavigate } from "svelte-navigator";
     import DesktopSearch from "./pages/Search.svelte";
     import DesktopQueue from "./pages/Queue.svelte";
+    import { Svroller } from "svrollbar";
     const location = useLocation();
     const navigate = useNavigate();
 
     export let result: SearchResult;
     export let searching;
     export let not_found;
-    const on_scroll = (
-        e: UIEvent & {
-            currentTarget: EventTarget & HTMLDivElement;
-        }
-    ) => {
-        const box = e.currentTarget.getBoundingClientRect();
-        const top = e.currentTarget.scrollTop;
-        const height = e.currentTarget.scrollHeight - box.height;
-        e.currentTarget.style.top = -190 * (top / height) + "px";
-    };
 </script>
 
 <div class="desktop">
@@ -150,7 +141,7 @@
             {:then result}
                 {#if result.total > 0}
                     {#if result.type == 0}
-                        <div class="inner scroll" on:scroll={on_scroll}>
+                        <div class="inner scroll">
                             {#each result.hits as data}
                                 <CommentCard
                                     {data}

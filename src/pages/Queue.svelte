@@ -75,7 +75,7 @@
     });
 </script>
 
-{#if $sizeLg}
+<!-- {#if $sizeLg}
     <div class="back-tab">
         <button
             style="width: 60px;"
@@ -86,7 +86,7 @@
             <ChevonL size={20} />
         </button>
     </div>
-{/if}
+{/if} -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <h1 class="title">
     <img style="width: 40px;" src="/yomi-full.png" alt="logo" />

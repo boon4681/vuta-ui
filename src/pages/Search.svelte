@@ -115,6 +115,8 @@
             { value: 1, render: "Newest" },
             { value: 0, render: "Relevance" },
             { value: -1, render: "Oldest" },
+            { value: -2, render: "Ascending" },
+            { value: 2, render: "Popular" },
         ]}
         on:change={(e) => {
             if (e.detail == 2 && $query == "") {
